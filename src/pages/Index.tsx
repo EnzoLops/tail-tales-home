@@ -1,10 +1,26 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, Home, Users, ArrowRight } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { AuthModal } from '@/components/AuthModal';
 import heroImage from '@/assets/hero-pets.jpg';
 
 const Index = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleAdoptClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    } else {
+      navigate('/pets');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-soft">
       {/* Hero Section */}
@@ -26,12 +42,10 @@ const Index = () => {
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
               Cada animal merece uma família que o ame. Conheça nossos pets disponíveis para adoção e encontre seu novo melhor amigo.
             </p>
-            <Link to="/pets">
-              <Button size="lg" className="text-lg px-8 py-6 gap-2 shadow-hover">
-                Quero Adotar um Pet
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
+            <Button size="lg" className="text-lg px-8 py-6 gap-2 shadow-hover" onClick={handleAdoptClick}>
+              Quero Adotar um Pet
+              <ArrowRight className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>
@@ -99,12 +113,10 @@ const Index = () => {
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
               Visite nossos pets disponíveis e encontre aquele que vai encher sua vida de alegria e amor incondicional.
             </p>
-            <Link to="/pets">
-              <Button size="lg" className="text-lg px-8 py-6 gap-2 shadow-hover">
-                Ver Pets Disponíveis
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
+            <Button size="lg" className="text-lg px-8 py-6 gap-2 shadow-hover" onClick={handleAdoptClick}>
+              Ver Pets Disponíveis
+              <ArrowRight className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </section>
@@ -117,6 +129,12 @@ const Index = () => {
           </p>
         </div>
       </footer>
+
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => navigate('/pets')}
+      />
     </div>
   );
 };
