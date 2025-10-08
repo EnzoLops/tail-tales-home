@@ -1,13 +1,16 @@
 import { Link, useParams } from 'react-router-dom';
+import { useState } from 'react';
 import { pets } from '@/data/pets';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Dog, Cat, Check, X, MessageCircle } from 'lucide-react';
+import ChatWidget from '@/components/ChatWidget';
 
 const PetDetail = () => {
   const { id } = useParams();
   const pet = pets.find(p => p.id === id);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   if (!pet) {
     return (
@@ -22,10 +25,8 @@ const PetDetail = () => {
     );
   }
 
-  const handleWhatsApp = () => {
-    const message = `Olá, gostaria de agendar uma visita para conhecer melhor ${pet.name}.`;
-    const whatsappUrl = `https://wa.me/5511999999999?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
+  const handleOpenChat = () => {
+    setIsChatOpen(true);
   };
 
   return (
@@ -97,7 +98,7 @@ const PetDetail = () => {
             </Card>
 
             <Button 
-              onClick={handleWhatsApp}
+              onClick={handleOpenChat}
               size="lg"
               className="w-full text-lg py-6 gap-2"
             >
@@ -123,6 +124,12 @@ const PetDetail = () => {
           </Card>
         </div>
       </main>
+
+      <ChatWidget 
+        isOpen={isChatOpen} 
+        onClose={() => setIsChatOpen(false)} 
+        petName={pet.name} 
+      />
     </div>
   );
 };
