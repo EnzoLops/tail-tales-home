@@ -73,15 +73,25 @@ const ChatWidget = ({ isOpen, onClose, petName }: ChatWidgetProps) => {
         body: JSON.stringify({
           message: inputMessage,
           petName: petName,
+          chatId: `pet-${petName}`,
+          conversationHistory: messages.map(msg => ({
+            role: msg.role,
+            content: msg.content,
+            timestamp: msg.timestamp.toISOString()
+          })),
           timestamp: new Date().toISOString()
         })
       });
+
+      if (!response.ok) {
+        throw new Error('Webhook request failed');
+      }
 
       const data = await response.json();
       
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.response || data.message || 'Desculpe, não consegui processar sua mensagem.',
+        content: data.response || data.output || data.reply || 'Desculpe, não consegui processar sua mensagem.',
         timestamp: new Date()
       };
 
