@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Home, Users, ArrowRight } from 'lucide-react';
+import { Heart, Home, Users, ArrowRight, MapPin, Phone, Instagram } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthModal } from '@/components/AuthModal';
 import heroImage from '@/assets/hero-pets.jpg';
@@ -122,11 +122,52 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-card py-8 border-t">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-muted-foreground">
-            © 2024 Adote um Pet. Feito com <Heart className="inline h-4 w-4 text-primary" /> para nossos amigos de quatro patas.
-          </p>
+      <footer className="bg-card py-12 border-t">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-8">
+            <div className="flex flex-col items-center md:items-start text-center md:text-left">
+              <div className="flex items-center gap-2 mb-2">
+                <MapPin className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-foreground">Endereço</h3>
+              </div>
+              <p className="text-muted-foreground">
+                Rua dos Amigos de Patas, 456<br />
+                Centro - São Paulo, SP<br />
+                CEP: 01234-567
+              </p>
+            </div>
+            
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-2 mb-2">
+                <Phone className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-foreground">Telefone</h3>
+              </div>
+              <p className="text-muted-foreground">
+                (11) 98765-4321
+              </p>
+            </div>
+            
+            <div className="flex flex-col items-center md:items-end text-center md:text-right">
+              <div className="flex items-center gap-2 mb-2">
+                <Instagram className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-foreground">Redes Sociais</h3>
+              </div>
+              <a 
+                href="https://instagram.com/adoteumpet" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                @adoteumpet
+              </a>
+            </div>
+          </div>
+          
+          <div className="text-center pt-6 border-t">
+            <p className="text-muted-foreground">
+              © 2024 Adote um Pet. Feito com <Heart className="inline h-4 w-4 text-primary" /> para nossos amigos de quatro patas.
+            </p>
+          </div>
         </div>
       </footer>
 
