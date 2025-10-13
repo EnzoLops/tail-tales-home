@@ -55,12 +55,22 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-16 animate-fade-in">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Sobre Nossa ONG
+              Sobre Nós
             </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Somos uma organização dedicada ao resgate, cuidado e adoção responsável de animais abandonados. 
-              Nossa missão é dar uma segunda chance a cães e gatos que precisam de um lar amoroso.
-            </p>
+            <div className="text-lg text-muted-foreground leading-relaxed space-y-4 text-left">
+              <p>
+                A PetLar é uma organização sem fins lucrativos que nasceu do amor e do respeito pelos animais. Nossa missão é resgatar, cuidar e promover a adoção responsável de pets abandonados ou em situação de vulnerabilidade, oferecendo a cada um deles uma nova chance de ser feliz.
+              </p>
+              <p>
+                Acreditamos que todo pet merece um lar cheio de carinho, segurança e dignidade. Por isso, trabalhamos todos os dias para proporcionar abrigo, cuidados veterinários, alimentação e muito amor aos nossos animais resgatados.
+              </p>
+              <p>
+                Além do resgate e da adoção, a PetLar também atua na conscientização da sociedade sobre a importância da adoção responsável, da castração e do respeito aos direitos dos animais, incentivando uma convivência mais humana e solidária entre pessoas e pets.
+              </p>
+              <p>
+                Com o apoio de voluntários, doadores e parceiros, conseguimos transformar histórias de abandono em finais felizes — onde cada pet encontra não apenas um lar, mas uma nova família.
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
