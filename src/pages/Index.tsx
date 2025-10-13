@@ -143,7 +143,7 @@ const Index = () => {
                 <h3 className="font-semibold text-foreground">Telefone</h3>
               </div>
               <p className="text-muted-foreground">
-                (11) 98765-4321
+                (11) 3456-7890
               </p>
             </div>
             
@@ -153,12 +153,12 @@ const Index = () => {
                 <h3 className="font-semibold text-foreground">Redes Sociais</h3>
               </div>
               <a 
-                href="https://instagram.com/adoteumpet" 
+                href="https://instagram.com/PetLarONG" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                @adoteumpet
+                @PetLarONG
               </a>
             </div>
           </div>
