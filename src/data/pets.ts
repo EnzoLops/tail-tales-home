@@ -1,3 +1,10 @@
+import dogThor from '@/assets/dog-thor.png';
+import dogBob from '@/assets/dog-bob.png';
+import dogRex from '@/assets/dog-rex.png';
+import catLuna from '@/assets/cat-luna.png';
+import catMia from '@/assets/cat-mia.png';
+import catMel from '@/assets/cat-mel.png';
+
 export interface Pet {
   id: string;
   name: string;
@@ -26,7 +33,7 @@ export const pets: Pet[] = [
     neutered: true,
     description: 'Thor é um labrador carinhoso e brincalhão que adora crianças.',
     history: 'Thor foi resgatado das ruas quando ainda era filhote. Ele é muito sociável e se dá bem com outros animais.',
-    image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80'
+    image: dogThor
   },
   {
     id: '2',
@@ -40,7 +47,7 @@ export const pets: Pet[] = [
     neutered: true,
     description: 'Luna é uma gatinha tranquila e elegante, perfeita para apartamentos.',
     history: 'Luna foi encontrada abandonada em uma caixa. Hoje é uma gatinha saudável e carinhosa.',
-    image: 'https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=800&q=80'
+    image: catLuna
   },
   {
     id: '3',
@@ -54,7 +61,7 @@ export const pets: Pet[] = [
     neutered: true,
     description: 'Bob é um cachorro calmo e fiel, ideal para famílias.',
     history: 'Bob viveu nas ruas por alguns anos antes de ser resgatado. É muito grato e companheiro.',
-    image: 'https://images.unsplash.com/photo-1477884213360-7e9d7dcc1e48?w=800&q=80'
+    image: dogBob
   },
   {
     id: '4',
@@ -68,7 +75,7 @@ export const pets: Pet[] = [
     neutered: false,
     description: 'Mel é uma gatinha peluda e super afetuosa.',
     history: 'Mel foi doada por uma família que não podia mais cuidar dela. É muito carinhosa e adora colo.',
-    image: 'https://images.unsplash.com/photo-1573865526739-10c1dd7aa1fe?w=800&q=80'
+    image: catMel
   },
   {
     id: '5',
@@ -82,7 +89,7 @@ export const pets: Pet[] = [
     neutered: true,
     description: 'Rex é protetor e leal, ótimo guardião para sua casa.',
     history: 'Rex foi treinado como cão de guarda mas seu antigo dono precisou se mudar. Ele é obediente e inteligente.',
-    image: 'https://images.unsplash.com/photo-1568572933382-74d440642117?w=800&q=80'
+    image: dogRex
   },
   {
     id: '6',
@@ -96,6 +103,6 @@ export const pets: Pet[] = [
     neutered: false,
     description: 'Mia é uma gatinha brincalhona e cheia de energia.',
     history: 'Mia nasceu na rua e foi resgatada muito novinha. É curiosa e adora brinquedos.',
-    image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800&q=80'
+    image: catMia
   }
 ];
