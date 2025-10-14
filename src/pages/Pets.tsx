@@ -6,11 +6,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dog, Cat, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 type FilterType = 'todos' | 'cachorro' | 'gato';
+type SizeFilter = 'todos' | 'Pequeno' | 'Médio' | 'Grande';
 
 const Pets = () => {
   const [filter, setFilter] = useState<FilterType>('todos');
+  const [sizeFilter, setSizeFilter] = useState<SizeFilter>('todos');
+  const [vaccinatedFilter, setVaccinatedFilter] = useState<boolean | null>(null);
+  const [neuteredFilter, setNeuteredFilter] = useState<boolean | null>(null);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -20,9 +27,21 @@ const Pets = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const filteredPets = filter === 'todos' 
-    ? pets 
-    : pets.filter(pet => pet.type === filter);
+  const filteredPets = pets.filter(pet => {
+    // Filtro de tipo
+    if (filter !== 'todos' && pet.type !== filter) return false;
+    
+    // Filtro de tamanho
+    if (sizeFilter !== 'todos' && pet.size !== sizeFilter) return false;
+    
+    // Filtro de vacinado
+    if (vaccinatedFilter !== null && pet.vaccinated !== vaccinatedFilter) return false;
+    
+    // Filtro de castrado
+    if (neuteredFilter !== null && pet.neutered !== neuteredFilter) return false;
+    
+    return true;
+  });
 
   if (!isAuthenticated) {
     return null;
@@ -46,7 +65,8 @@ const Pets = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap gap-3 mb-8 justify-center">
+        {/* Filtros principais */}
+        <div className="flex flex-wrap gap-3 mb-6 justify-center">
           <Button
             variant={filter === 'todos' ? 'default' : 'outline'}
             onClick={() => setFilter('todos')}
@@ -70,6 +90,78 @@ const Pets = () => {
             <Cat className="h-4 w-4" />
             Gatos
           </Button>
+        </div>
+
+        {/* Filtros adicionais */}
+        <div className="bg-card p-6 rounded-lg shadow-sm mb-8">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Filtros Adicionais</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Filtro de Tamanho */}
+            <div className="space-y-2">
+              <Label htmlFor="size-filter">Tamanho</Label>
+              <Select value={sizeFilter} onValueChange={(value) => setSizeFilter(value as SizeFilter)}>
+                <SelectTrigger id="size-filter">
+                  <SelectValue placeholder="Selecione o tamanho" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os tamanhos</SelectItem>
+                  <SelectItem value="Pequeno">Pequeno</SelectItem>
+                  <SelectItem value="Médio">Médio</SelectItem>
+                  <SelectItem value="Grande">Grande</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Filtro de Vacinado */}
+            <div className="space-y-2">
+              <Label>Vacinação</Label>
+              <div className="flex items-center space-x-6 pt-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="vaccinated" 
+                    checked={vaccinatedFilter === true}
+                    onCheckedChange={(checked) => setVaccinatedFilter(checked ? true : null)}
+                  />
+                  <Label htmlFor="vaccinated" className="font-normal cursor-pointer">
+                    Vacinado
+                  </Label>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setVaccinatedFilter(null)}
+                  className="text-xs"
+                >
+                  Limpar
+                </Button>
+              </div>
+            </div>
+
+            {/* Filtro de Castrado */}
+            <div className="space-y-2">
+              <Label>Castração</Label>
+              <div className="flex items-center space-x-6 pt-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="neutered" 
+                    checked={neuteredFilter === true}
+                    onCheckedChange={(checked) => setNeuteredFilter(checked ? true : null)}
+                  />
+                  <Label htmlFor="neutered" className="font-normal cursor-pointer">
+                    Castrado
+                  </Label>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setNeuteredFilter(null)}
+                  className="text-xs"
+                >
+                  Limpar
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
