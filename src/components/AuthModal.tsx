@@ -14,6 +14,8 @@ interface AuthModalProps {
 
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [isSignup, setIsSignup] = useState(false);
+  const [name, setName] = useState('');
+  const [cpf, setCpf] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [birthDate, setBirthDate] = useState('');
@@ -23,12 +25,12 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     e.preventDefault();
 
     if (isSignup) {
-      if (!email || !password || !birthDate) {
+      if (!name || !cpf || !email || !password || !birthDate) {
         toast.error('Preencha todos os campos');
         return;
       }
 
-      const result = signup(email, password, birthDate);
+      const result = signup(name, cpf, email, password, birthDate);
       if (result.success) {
         toast.success('Cadastro realizado com sucesso!');
         onSuccess();
@@ -53,6 +55,8 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   };
 
   const handleClose = () => {
+    setName('');
+    setCpf('');
     setEmail('');
     setPassword('');
     setBirthDate('');
@@ -73,6 +77,47 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignup && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome Completo</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Seu nome completo"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cpf">CPF</Label>
+                <Input
+                  id="cpf"
+                  type="text"
+                  placeholder="000.000.000-00"
+                  value={cpf}
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 11) {
+                      if (value.length > 9) {
+                        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, '$1.$2.$3-$4');
+                      } else if (value.length > 6) {
+                        value = value.replace(/(\d{3})(\d{3})(\d{0,3})/, '$1.$2.$3');
+                      } else if (value.length > 3) {
+                        value = value.replace(/(\d{3})(\d{0,3})/, '$1.$2');
+                      }
+                      setCpf(value);
+                    }
+                  }}
+                  required
+                  maxLength={14}
+                />
+              </div>
+            </>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input

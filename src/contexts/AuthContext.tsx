@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
+  name: string;
+  cpf: string;
   email: string;
   birthDate: string;
 }
@@ -8,7 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => boolean;
-  signup: (email: string, password: string, birthDate: string) => { success: boolean; error?: string };
+  signup: (name: string, cpf: string, email: string, password: string, birthDate: string) => { success: boolean; error?: string };
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -30,7 +32,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userData = users[email];
 
     if (userData && userData.password === password) {
-      const user = { email, birthDate: userData.birthDate };
+      const user = { 
+        name: userData.name, 
+        cpf: userData.cpf, 
+        email, 
+        birthDate: userData.birthDate 
+      };
       setUser(user);
       localStorage.setItem('currentUser', JSON.stringify(user));
       return true;
@@ -38,11 +45,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  const signup = (email: string, password: string, birthDate: string) => {
+  const signup = (name: string, cpf: string, email: string, password: string, birthDate: string) => {
     const users = JSON.parse(localStorage.getItem('users') || '{}');
 
     if (users[email]) {
       return { success: false, error: 'Email já cadastrado' };
+    }
+
+    // Validar CPF (apenas dígitos)
+    const cpfClean = cpf.replace(/\D/g, '');
+    if (cpfClean.length !== 11) {
+      return { success: false, error: 'CPF inválido' };
     }
 
     const birthDateObj = new Date(birthDate);
@@ -57,10 +70,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: 'Você precisa ter 18 anos ou mais para se cadastrar' };
     }
 
-    users[email] = { password, birthDate };
+    users[email] = { name, cpf: cpfClean, password, birthDate };
     localStorage.setItem('users', JSON.stringify(users));
 
-    const user = { email, birthDate };
+    const user = { name, cpf: cpfClean, email, birthDate };
     setUser(user);
     localStorage.setItem('currentUser', JSON.stringify(user));
 
