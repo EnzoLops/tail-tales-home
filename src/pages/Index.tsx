@@ -141,9 +141,8 @@ const Index = () => {
                 <h3 className="font-semibold text-foreground">Endereço</h3>
               </div>
               <p className="text-muted-foreground">
-                Rua dos Amigos de Patas, 456<br />
-                Centro - São Paulo, SP<br />
-                CEP: 01234-567
+                Rua das Flores, 123<br />
+                Centro, São Paulo - SP
               </p>
             </div>
             
