@@ -4,7 +4,7 @@ import { pets } from '@/data/pets';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Dog, Cat, Check, X, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Dog, Cat, Check, X, MessageCircle, MapPin } from 'lucide-react';
 import ChatWidget from '@/components/ChatWidget';
 
 const PetDetail = () => {
@@ -93,6 +93,18 @@ const PetDetail = () => {
                   <span className="text-foreground">
                     {pet.neutered ? 'Castrado' : 'Castração pendente'}
                   </span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-secondary/10 border-secondary/20">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground mb-1">Localização da ONG</p>
+                    <p className="text-sm text-muted-foreground">{pet.address}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
