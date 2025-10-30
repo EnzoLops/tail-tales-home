@@ -1,50 +1,81 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { pets } from '@/data/pets';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dog, Cat, ArrowLeft } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 type FilterType = 'todos' | 'cachorro' | 'gato';
 type SizeFilter = 'todos' | 'Pequeno' | 'Médio' | 'Grande';
 
+interface Pet {
+  id: string;
+  name: string;
+  type: 'cachorro' | 'gato';
+  breed: string;
+  age: string;
+  gender: 'Macho' | 'Fêmea';
+  size: 'Pequeno' | 'Médio' | 'Grande';
+  vaccinated: boolean;
+  neutered: boolean;
+  description: string;
+  image: string;
+}
+
 const Pets = () => {
+  const [pets, setPets] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>('todos');
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>('todos');
   const [vaccinatedFilter, setVaccinatedFilter] = useState<boolean | null>(null);
   const [neuteredFilter, setNeuteredFilter] = useState<boolean | null>(null);
-  const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/');
+    loadPets();
+  }, []);
+
+  const loadPets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*')
+        .eq('adopted', false)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPets(data || []);
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao carregar pets',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [isAuthenticated, navigate]);
+  };
 
   const filteredPets = pets.filter(pet => {
-    // Filtro de tipo
     if (filter !== 'todos' && pet.type !== filter) return false;
-    
-    // Filtro de tamanho
     if (sizeFilter !== 'todos' && pet.size !== sizeFilter) return false;
-    
-    // Filtro de vacinado
     if (vaccinatedFilter !== null && pet.vaccinated !== vaccinatedFilter) return false;
-    
-    // Filtro de castrado
     if (neuteredFilter !== null && pet.neutered !== neuteredFilter) return false;
-    
     return true;
   });
 
-  if (!isAuthenticated) {
-    return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg">Carregando pets...</p>
+      </div>
+    );
   }
 
   return (

@@ -14,16 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      pets: {
+        Row: {
+          address: string
+          adopted: boolean
+          age: string
+          breed: string
+          created_at: string
+          description: string
+          gender: Database["public"]["Enums"]["pet_gender"]
+          history: string
+          id: string
+          image: string
+          name: string
+          neutered: boolean
+          size: Database["public"]["Enums"]["pet_size"]
+          type: Database["public"]["Enums"]["pet_type"]
+          updated_at: string
+          vaccinated: boolean
+        }
+        Insert: {
+          address: string
+          adopted?: boolean
+          age: string
+          breed: string
+          created_at?: string
+          description: string
+          gender: Database["public"]["Enums"]["pet_gender"]
+          history: string
+          id?: string
+          image: string
+          name: string
+          neutered?: boolean
+          size: Database["public"]["Enums"]["pet_size"]
+          type: Database["public"]["Enums"]["pet_type"]
+          updated_at?: string
+          vaccinated?: boolean
+        }
+        Update: {
+          address?: string
+          adopted?: boolean
+          age?: string
+          breed?: string
+          created_at?: string
+          description?: string
+          gender?: Database["public"]["Enums"]["pet_gender"]
+          history?: string
+          id?: string
+          image?: string
+          name?: string
+          neutered?: boolean
+          size?: Database["public"]["Enums"]["pet_size"]
+          type?: Database["public"]["Enums"]["pet_type"]
+          updated_at?: string
+          vaccinated?: boolean
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      pet_gender: "Macho" | "Fêmea"
+      pet_size: "Pequeno" | "Médio" | "Grande"
+      pet_type: "cachorro" | "gato"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +236,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      pet_gender: ["Macho", "Fêmea"],
+      pet_size: ["Pequeno", "Médio", "Grande"],
+      pet_type: ["cachorro", "gato"],
+    },
   },
 } as const

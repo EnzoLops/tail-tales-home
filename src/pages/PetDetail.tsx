@@ -1,16 +1,73 @@
 import { Link, useParams } from 'react-router-dom';
-import { useState } from 'react';
-import { pets } from '@/data/pets';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Dog, Cat, Check, X, MessageCircle, MapPin } from 'lucide-react';
 import ChatWidget from '@/components/ChatWidget';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface Pet {
+  id: string;
+  name: string;
+  type: 'cachorro' | 'gato';
+  breed: string;
+  age: string;
+  gender: 'Macho' | 'Fêmea';
+  size: 'Pequeno' | 'Médio' | 'Grande';
+  vaccinated: boolean;
+  neutered: boolean;
+  description: string;
+  history: string;
+  image: string;
+  address: string;
+}
 
 const PetDetail = () => {
   const { id } = useParams();
-  const pet = pets.find(p => p.id === id);
+  const { toast } = useToast();
+  const [pet, setPet] = useState<Pet | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  useEffect(() => {
+    loadPet();
+  }, [id]);
+
+  const loadPet = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*')
+        .eq('id', id)
+        .eq('adopted', false)
+        .maybeSingle();
+
+      if (error) throw error;
+      setPet(data);
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao carregar pet',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenChat = () => {
+    setIsChatOpen(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-soft flex items-center justify-center">
+        <p className="text-lg">Carregando...</p>
+      </div>
+    );
+  }
 
   if (!pet) {
     return (
@@ -24,10 +81,6 @@ const PetDetail = () => {
       </div>
     );
   }
-
-  const handleOpenChat = () => {
-    setIsChatOpen(true);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-soft">
