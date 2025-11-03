@@ -1,114 +1,70 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft } from 'lucide-react';
 
-export default function Login() {
+const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { login, signup, user } = useAuth();
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        navigate('/admin');
-      }
-    });
-  }, [navigate]);
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      if (!data.user) throw new Error('Erro ao criar usuário');
-
-      // Add admin role
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert([{ user_id: data.user.id, role: 'admin' }]);
-
-      if (roleError) throw roleError;
-
-      toast({
-        title: 'Conta criada!',
-        description: 'Conta de administrador criada com sucesso. Fazendo login...',
-      });
-
-      // Auto login
-      const { error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (loginError) throw loginError;
-
-      navigate('/admin');
-    } catch (error: any) {
-      toast({
-        title: 'Erro ao criar conta',
-        description: error.message || 'Não foi possível criar a conta.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      // Check if user is admin
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não encontrado');
-
-      const { data: roles } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id);
-
-      if (roles && roles.some(r => r.role === 'admin')) {
-        toast({
-          title: 'Login realizado!',
-          description: 'Bem-vindo ao painel administrativo.',
-        });
+    if (user) {
+      if (user.isAdmin) {
         navigate('/admin');
       } else {
-        await supabase.auth.signOut();
-        toast({
-          title: 'Acesso negado',
-          description: 'Você não tem permissão para acessar esta área.',
-          variant: 'destructive',
-        });
+        navigate('/pets');
+      }
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (isSignUp) {
+        const result = await signup(email, password);
+        
+        if (result.success) {
+          toast({
+            title: 'Conta criada!',
+            description: 'Sua conta foi criada com sucesso.',
+          });
+          navigate('/pets');
+        } else {
+          throw new Error(result.error);
+        }
+      } else {
+        const result = await login(email, password);
+        
+        if (result.success) {
+          toast({
+            title: 'Login realizado!',
+            description: 'Bem-vindo de volta!',
+          });
+          
+          if (result.isAdmin) {
+            navigate('/admin');
+          } else {
+            navigate('/pets');
+          }
+        } else {
+          throw new Error(result.error);
+        }
       }
     } catch (error: any) {
       toast({
-        title: 'Erro no login',
-        description: error.message || 'Email ou senha incorretos.',
+        title: isSignUp ? 'Erro ao criar conta' : 'Erro ao fazer login',
+        description: error.message || 'Ocorreu um erro. Tente novamente.',
         variant: 'destructive',
       });
     } finally {
@@ -117,32 +73,23 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-soft p-4">
       <div className="w-full max-w-md">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Voltar
-        </Button>
-
         <Card>
           <CardHeader>
-            <CardTitle>Acesso Administrativo</CardTitle>
+            <CardTitle>{isSignUp ? 'Criar Conta' : 'Entrar'}</CardTitle>
             <CardDescription>
-              {isSignUp ? 'Criar nova conta de administrador' : 'Entre com suas credenciais para acessar o painel'}
+              {isSignUp ? 'Crie sua conta para adotar um pet' : 'Entre com suas credenciais'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@exemplo.com"
+                  placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -162,7 +109,7 @@ export default function Login() {
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (isSignUp ? 'Criando...' : 'Entrando...') : (isSignUp ? 'Criar Conta Admin' : 'Entrar')}
+                {loading ? (isSignUp ? 'Criando...' : 'Entrando...') : (isSignUp ? 'Criar Conta' : 'Entrar')}
               </Button>
 
               <Button 
@@ -171,12 +118,20 @@ export default function Login() {
                 className="w-full" 
                 onClick={() => setIsSignUp(!isSignUp)}
               >
-                {isSignUp ? 'Já tem conta? Fazer login' : 'Criar conta de administrador'}
+                {isSignUp ? 'Já tem conta? Entrar' : 'Não tem conta? Criar'}
               </Button>
             </form>
+
+            <div className="mt-6 text-center">
+              <Link to="/" className="text-sm text-primary hover:underline">
+                ← Voltar para página inicial
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
     </div>
   );
-}
+};
+
+export default Login;

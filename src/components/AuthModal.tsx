@@ -21,7 +21,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [birthDate, setBirthDate] = useState('');
   const { login, signup } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isSignup) {
@@ -30,7 +30,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         return;
       }
 
-      const result = signup(name, cpf, email, password, birthDate);
+      const result = await signup(email, password);
       if (result.success) {
         toast.success('Cadastro realizado com sucesso!');
         onSuccess();
@@ -44,7 +44,8 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         return;
       }
 
-      if (login(email, password)) {
+      const result = await login(email, password);
+      if (result.success) {
         toast.success('Login realizado com sucesso!');
         onSuccess();
         handleClose();

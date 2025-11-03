@@ -3,12 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dog, Cat, ArrowLeft } from 'lucide-react';
+import { Dog, Cat, ArrowLeft, LogOut } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 type FilterType = 'todos' | 'cachorro' | 'gato';
 type SizeFilter = 'todos' | 'Pequeno' | 'Médio' | 'Grande';
@@ -36,6 +37,16 @@ const Pets = () => {
   const [neuteredFilter, setNeuteredFilter] = useState<boolean | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    toast({
+      title: 'Desconectado',
+      description: 'Você saiu da sua conta.',
+    });
+    navigate('/login');
+  };
 
   useEffect(() => {
     loadPets();
@@ -82,10 +93,16 @@ const Pets = () => {
     <div className="min-h-screen bg-gradient-soft">
       <header className="bg-card shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
-          <Link to="/" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors mb-4">
-            <ArrowLeft className="h-5 w-5" />
-            <span className="font-semibold">Voltar</span>
-          </Link>
+          <div className="flex justify-between items-start mb-4">
+            <Link to="/" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
+              <ArrowLeft className="h-5 w-5" />
+              <span className="font-semibold">Voltar</span>
+            </Link>
+            <Button variant="outline" onClick={handleLogout} className="gap-2">
+              <LogOut className="h-4 w-4" />
+              Sair
+            </Button>
+          </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
             Pets Disponíveis para Adoção
           </h1>

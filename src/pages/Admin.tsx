@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut, Plus, Check, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Pet {
   id: string;
@@ -35,6 +36,7 @@ export default function Admin() {
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { logout, user } = useAuth();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -53,31 +55,23 @@ export default function Admin() {
   });
 
   useEffect(() => {
-    checkAuth();
-    loadPets();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    if (!user) {
       navigate('/login');
       return;
     }
-
-    const { data: roles } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', session.user.id);
-
-    if (!roles || !roles.some(r => r.role === 'admin')) {
+    
+    if (!user.isAdmin) {
       toast({
         title: 'Acesso negado',
         description: 'Você não tem permissão para acessar esta página.',
         variant: 'destructive',
       });
-      navigate('/');
+      navigate('/pets');
+      return;
     }
-  };
+
+    loadPets();
+  }, [user, navigate]);
 
   const loadPets = async () => {
     try {
@@ -100,8 +94,12 @@ export default function Admin() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
+    await logout();
+    toast({
+      title: 'Desconectado',
+      description: 'Você saiu da conta de administrador.',
+    });
+    navigate('/login');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

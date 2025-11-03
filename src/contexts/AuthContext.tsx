@@ -1,92 +1,138 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface User {
-  name: string;
-  cpf: string;
+  id: string;
   email: string;
-  birthDate: string;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
-  signup: (name: string, cpf: string, email: string, password: string, birthDate: string) => { success: boolean; error?: string };
-  logout: () => void;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; isAdmin?: boolean }>;
+  signup: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        checkAndSetUser(session.user);
+      } else {
+        setLoading(false);
+      }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        checkAndSetUser(session.user);
+      } else {
+        setUser(null);
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (email: string, password: string): boolean => {
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
-    const userData = users[email];
+  const checkAndSetUser = async (supabaseUser: SupabaseUser) => {
+    try {
+      // Check if user is admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', supabaseUser.id)
+        .eq('role', 'admin')
+        .single();
 
-    if (userData && userData.password === password) {
-      const user = { 
-        name: userData.name, 
-        cpf: userData.cpf, 
-        email, 
-        birthDate: userData.birthDate 
-      };
-      setUser(user);
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      return true;
+      setUser({
+        id: supabaseUser.id,
+        email: supabaseUser.email || '',
+        isAdmin: !!roleData,
+      });
+    } catch (error) {
+      setUser({
+        id: supabaseUser.id,
+        email: supabaseUser.email || '',
+        isAdmin: false,
+      });
+    } finally {
+      setLoading(false);
     }
-    return false;
   };
 
-  const signup = (name: string, cpf: string, email: string, password: string, birthDate: string) => {
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
+  const login = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (users[email]) {
-      return { success: false, error: 'Email já cadastrado' };
+      if (error) throw error;
+      if (!data.user) throw new Error('Erro ao fazer login');
+
+      // Check if admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .eq('role', 'admin')
+        .single();
+
+      const isAdmin = !!roleData;
+
+      setUser({
+        id: data.user.id,
+        email: data.user.email || '',
+        isAdmin,
+      });
+
+      return { success: true, isAdmin };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Erro ao fazer login' };
     }
-
-    // Validar CPF (apenas dígitos)
-    const cpfClean = cpf.replace(/\D/g, '');
-    if (cpfClean.length !== 11) {
-      return { success: false, error: 'CPF inválido' };
-    }
-
-    const birthDateObj = new Date(birthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birthDateObj.getFullYear();
-    const monthDiff = today.getMonth() - birthDateObj.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDateObj.getDate())) {
-      age--;
-    }
-
-    if (age < 18) {
-      return { success: false, error: 'Você precisa ter 18 anos ou mais para se cadastrar' };
-    }
-
-    users[email] = { name, cpf: cpfClean, password, birthDate };
-    localStorage.setItem('users', JSON.stringify(users));
-
-    const user = { name, cpf: cpfClean, email, birthDate };
-    setUser(user);
-    localStorage.setItem('currentUser', JSON.stringify(user));
-
-    return { success: true };
   };
 
-  const logout = () => {
+  const signup = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      if (!data.user) throw new Error('Erro ao criar conta');
+
+      setUser({
+        id: data.user.id,
+        email: data.user.email || '',
+        isAdmin: false,
+      });
+
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, error: error.message || 'Erro ao criar conta' };
+    }
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem('currentUser');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, isAuthenticated: !!user, loading }}>
       {children}
     </AuthContext.Provider>
   );
