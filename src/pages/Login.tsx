@@ -12,6 +12,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -23,6 +24,51 @@ export default function Login() {
       }
     });
   }, [navigate]);
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      if (!data.user) throw new Error('Erro ao criar usuário');
+
+      // Add admin role
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .insert([{ user_id: data.user.id, role: 'admin' }]);
+
+      if (roleError) throw roleError;
+
+      toast({
+        title: 'Conta criada!',
+        description: 'Conta de administrador criada com sucesso. Fazendo login...',
+      });
+
+      // Auto login
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (loginError) throw loginError;
+
+      navigate('/admin');
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao criar conta',
+        description: error.message || 'Não foi possível criar a conta.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,11 +132,11 @@ export default function Login() {
           <CardHeader>
             <CardTitle>Acesso Administrativo</CardTitle>
             <CardDescription>
-              Entre com suas credenciais para acessar o painel
+              {isSignUp ? 'Criar nova conta de administrador' : 'Entre com suas credenciais para acessar o painel'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -116,7 +162,16 @@ export default function Login() {
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Entrando...' : 'Entrar'}
+                {loading ? (isSignUp ? 'Criando...' : 'Entrando...') : (isSignUp ? 'Criar Conta Admin' : 'Entrar')}
+              </Button>
+
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="w-full" 
+                onClick={() => setIsSignUp(!isSignUp)}
+              >
+                {isSignUp ? 'Já tem conta? Fazer login' : 'Criar conta de administrador'}
               </Button>
             </form>
           </CardContent>
