@@ -16,6 +16,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [isSignup, setIsSignup] = useState(false);
   const [name, setName] = useState('');
   const [cpf, setCpf] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [birthDate, setBirthDate] = useState('');
@@ -25,12 +26,20 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
     e.preventDefault();
 
     if (isSignup) {
-      if (!name || !cpf || !email || !password || !birthDate) {
+      if (!name || !cpf || !phone || !email || !password || !birthDate) {
         toast.error('Preencha todos os campos');
         return;
       }
 
-      const result = await signup(email, password);
+      const result = await signup({
+        email,
+        password,
+        name,
+        cpf,
+        phone,
+        birthDate,
+      });
+      
       if (result.success) {
         toast.success('Cadastro realizado com sucesso!');
         onSuccess();
@@ -58,6 +67,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const handleClose = () => {
     setName('');
     setCpf('');
+    setPhone('');
     setEmail('');
     setPassword('');
     setBirthDate('');
@@ -114,6 +124,31 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
                   }}
                   required
                   maxLength={14}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input
+                  id="phone"
+                  type="text"
+                  placeholder="(00) 00000-0000"
+                  value={phone}
+                  onChange={(e) => {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 11) {
+                      if (value.length > 10) {
+                        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                      } else if (value.length > 6) {
+                        value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+                      } else if (value.length > 2) {
+                        value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+                      }
+                      setPhone(value);
+                    }
+                  }}
+                  required
+                  maxLength={15}
                 />
               </div>
             </>

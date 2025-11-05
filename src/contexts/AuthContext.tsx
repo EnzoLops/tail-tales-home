@@ -8,10 +8,19 @@ interface User {
   isAdmin: boolean;
 }
 
+interface SignupData {
+  email: string;
+  password: string;
+  name: string;
+  cpf: string;
+  phone: string;
+  birthDate: string;
+}
+
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; isAdmin?: boolean }>;
-  signup: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (data: SignupData) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   loading: boolean;
@@ -104,19 +113,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signup = async (email: string, password: string) => {
+  const signup = async (data: SignupData) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
       });
 
       if (error) throw error;
-      if (!data.user) throw new Error('Erro ao criar conta');
+      if (!authData.user) throw new Error('Erro ao criar conta');
+
+      // Create profile with additional data
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([
+          {
+            user_id: authData.user.id,
+            name: data.name,
+            cpf: data.cpf,
+            phone: data.phone,
+            birth_date: data.birthDate,
+          },
+        ]);
+
+      if (profileError) throw profileError;
 
       setUser({
-        id: data.user.id,
-        email: data.user.email || '',
+        id: authData.user.id,
+        email: authData.user.email || '',
         isAdmin: false,
       });
 

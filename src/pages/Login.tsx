@@ -6,23 +6,19 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { login, signup, user } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      if (user.isAdmin) {
-        navigate('/admin');
-      } else {
-        navigate('/pets');
-      }
+    if (user && user.isAdmin) {
+      navigate('/admin');
     }
   }, [user, navigate]);
 
@@ -31,40 +27,41 @@ const Login = () => {
     setLoading(true);
 
     try {
-      if (isSignUp) {
-        const result = await signup(email, password);
-        
-        if (result.success) {
-          toast({
-            title: 'Conta criada!',
-            description: 'Sua conta foi criada com sucesso.',
-          });
-          navigate('/pets');
-        } else {
-          throw new Error(result.error);
-        }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      if (!data.user) throw new Error('Erro ao fazer login');
+
+      // Check if user is admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', data.user.id)
+        .eq('role', 'admin')
+        .single();
+
+      const isAdmin = !!roleData;
+
+      if (isAdmin) {
+        toast({
+          title: 'Login realizado!',
+          description: 'Bem-vindo, administrador!',
+        });
+        navigate('/admin');
       } else {
-        const result = await login(email, password);
-        
-        if (result.success) {
-          toast({
-            title: 'Login realizado!',
-            description: 'Bem-vindo de volta!',
-          });
-          
-          if (result.isAdmin) {
-            navigate('/admin');
-          } else {
-            navigate('/pets');
-          }
-        } else {
-          throw new Error(result.error);
-        }
+        toast({
+          title: 'Acesso negado',
+          description: 'Esta área é apenas para administradores.',
+          variant: 'destructive',
+        });
       }
     } catch (error: any) {
       toast({
-        title: isSignUp ? 'Erro ao criar conta' : 'Erro ao fazer login',
-        description: error.message || 'Ocorreu um erro. Tente novamente.',
+        title: 'Erro ao fazer login',
+        description: error.message || 'Email ou senha incorretos.',
         variant: 'destructive',
       });
     } finally {
@@ -77,9 +74,9 @@ const Login = () => {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader>
-            <CardTitle>{isSignUp ? 'Criar Conta' : 'Entrar'}</CardTitle>
+            <CardTitle>Login Administrativo</CardTitle>
             <CardDescription>
-              {isSignUp ? 'Crie sua conta para adotar um pet' : 'Entre com suas credenciais'}
+              Acesso restrito para administradores
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -89,7 +86,7 @@ const Login = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="seu@email.com"
+                  placeholder="admin@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -109,16 +106,7 @@ const Login = () => {
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (isSignUp ? 'Criando...' : 'Entrando...') : (isSignUp ? 'Criar Conta' : 'Entrar')}
-              </Button>
-
-              <Button 
-                type="button" 
-                variant="ghost" 
-                className="w-full" 
-                onClick={() => setIsSignUp(!isSignUp)}
-              >
-                {isSignUp ? 'Já tem conta? Entrar' : 'Não tem conta? Criar'}
+                {loading ? 'Entrando...' : 'Entrar como Admin'}
               </Button>
             </form>
 
