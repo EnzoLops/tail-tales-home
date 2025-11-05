@@ -51,7 +51,7 @@ const Index = () => {
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="absolute top-4 right-4">
-            <Button variant="ghost" onClick={() => navigate('/login')}>
+            <Button variant="ghost" onClick={() => navigate('/admin')}>
               <Shield className="mr-2 h-4 w-4" />
               Admin
             </Button>

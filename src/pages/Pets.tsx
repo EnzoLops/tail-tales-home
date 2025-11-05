@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthModal } from '@/components/AuthModal';
 
 type FilterType = 'todos' | 'cachorro' | 'gato';
 type SizeFilter = 'todos' | 'Pequeno' | 'Médio' | 'Grande';
@@ -35,9 +36,10 @@ const Pets = () => {
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>('todos');
   const [vaccinatedFilter, setVaccinatedFilter] = useState<boolean | null>(null);
   const [neuteredFilter, setNeuteredFilter] = useState<boolean | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -45,12 +47,15 @@ const Pets = () => {
       title: 'Desconectado',
       description: 'Você saiu da sua conta.',
     });
-    navigate('/login');
+    navigate('/');
   };
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+    }
     loadPets();
-  }, []);
+  }, [isAuthenticated]);
 
   const loadPets = async () => {
     try {
@@ -85,6 +90,23 @@ const Pets = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-lg">Carregando pets...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-soft flex items-center justify-center">
+        <AuthModal 
+          isOpen={showAuthModal} 
+          onClose={() => {
+            setShowAuthModal(false);
+            navigate('/');
+          }}
+          onSuccess={() => {
+            setShowAuthModal(false);
+          }}
+        />
       </div>
     );
   }
