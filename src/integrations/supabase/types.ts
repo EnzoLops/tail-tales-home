@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      adoptions: {
+        Row: {
+          adopted_at: string
+          adopter_cpf: string
+          adopter_name: string
+          adopter_phone: string
+          created_at: string
+          id: string
+          pet_id: string
+        }
+        Insert: {
+          adopted_at?: string
+          adopter_cpf: string
+          adopter_name: string
+          adopter_phone: string
+          created_at?: string
+          id?: string
+          pet_id: string
+        }
+        Update: {
+          adopted_at?: string
+          adopter_cpf?: string
+          adopter_name?: string
+          adopter_phone?: string
+          created_at?: string
+          id?: string
+          pet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "adoptions_pet_id_fkey"
+            columns: ["pet_id"]
+            isOneToOne: false
+            referencedRelation: "pets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pets: {
         Row: {
           address: string

@@ -9,8 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Plus, Check, X } from 'lucide-react';
+import { LogOut, Plus, Check, X, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface Pet {
   id: string;
@@ -33,8 +34,18 @@ export default function Admin() {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showAdoptionModal, setShowAdoptionModal] = useState(false);
+  const [selectedPetForAdoption, setSelectedPetForAdoption] = useState<Pet | null>(null);
+  const [filterStatus, setFilterStatus] = useState<'todos' | 'disponiveis' | 'adotados'>('disponiveis');
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Adoption form state
+  const [adoptionData, setAdoptionData] = useState({
+    adopter_name: '',
+    adopter_cpf: '',
+    adopter_phone: '',
+  });
 
   // Form state
   const [formData, setFormData] = useState({
@@ -127,20 +138,29 @@ export default function Admin() {
     }
   };
 
-  const toggleAdopted = async (petId: string, currentStatus: boolean) => {
+  const handleAdoptClick = (pet: Pet) => {
+    if (pet.adopted) {
+      // If already adopted, just toggle back to available
+      toggleAvailable(pet.id);
+    } else {
+      // If not adopted, open modal to collect adopter info
+      setSelectedPetForAdoption(pet);
+      setShowAdoptionModal(true);
+    }
+  };
+
+  const toggleAvailable = async (petId: string) => {
     try {
       const { error } = await supabase
         .from('pets')
-        .update({ adopted: !currentStatus })
+        .update({ adopted: false })
         .eq('id', petId);
 
       if (error) throw error;
 
       toast({
-        title: currentStatus ? 'Pet disponível novamente' : 'Pet marcado como adotado',
-        description: currentStatus 
-          ? 'O pet voltou para a lista de disponíveis.' 
-          : 'O pet foi marcado como adotado e não aparecerá mais no site.',
+        title: 'Pet disponível novamente',
+        description: 'O pet voltou para a lista de disponíveis.',
       });
 
       loadPets();
@@ -150,6 +170,57 @@ export default function Admin() {
         description: error.message,
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleAdoptionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedPetForAdoption) return;
+
+    setLoading(true);
+
+    try {
+      // Insert adoption record
+      const { error: adoptionError } = await supabase
+        .from('adoptions')
+        .insert([{
+          pet_id: selectedPetForAdoption.id,
+          adopter_name: adoptionData.adopter_name,
+          adopter_cpf: adoptionData.adopter_cpf,
+          adopter_phone: adoptionData.adopter_phone,
+        }]);
+
+      if (adoptionError) throw adoptionError;
+
+      // Mark pet as adopted
+      const { error: petError } = await supabase
+        .from('pets')
+        .update({ adopted: true })
+        .eq('id', selectedPetForAdoption.id);
+
+      if (petError) throw petError;
+
+      toast({
+        title: 'Pet adotado!',
+        description: 'As informações do adotante foram registradas.',
+      });
+
+      setShowAdoptionModal(false);
+      setSelectedPetForAdoption(null);
+      setAdoptionData({
+        adopter_name: '',
+        adopter_cpf: '',
+        adopter_phone: '',
+      });
+      loadPets();
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao registrar adoção',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -174,10 +245,41 @@ export default function Admin() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-xl font-semibold">
-            Gerenciar Pets ({pets.length})
-          </h2>
+        <div className="mb-6 flex justify-between items-center flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-semibold">
+              Gerenciar Pets ({pets.filter(p => 
+                filterStatus === 'todos' ? true : 
+                filterStatus === 'adotados' ? p.adopted : !p.adopted
+              ).length})
+            </h2>
+            <div className="flex gap-2">
+              <Button
+                variant={filterStatus === 'disponiveis' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterStatus('disponiveis')}
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Disponíveis
+              </Button>
+              <Button
+                variant={filterStatus === 'adotados' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterStatus('adotados')}
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Adotados
+              </Button>
+              <Button
+                variant={filterStatus === 'todos' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterStatus('todos')}
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Todos
+              </Button>
+            </div>
+          </div>
           <Button onClick={() => setShowForm(!showForm)}>
             <Plus className="mr-2 h-4 w-4" />
             {showForm ? 'Cancelar' : 'Adicionar Pet'}
@@ -356,7 +458,12 @@ export default function Admin() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pets.map((pet) => (
+          {pets
+            .filter(pet => 
+              filterStatus === 'todos' ? true : 
+              filterStatus === 'adotados' ? pet.adopted : !pet.adopted
+            )
+            .map((pet) => (
             <Card key={pet.id} className={pet.adopted ? 'opacity-60' : ''}>
               <CardHeader>
                 <div className="flex justify-between items-start">
@@ -380,7 +487,7 @@ export default function Admin() {
                 <Button
                   variant={pet.adopted ? 'outline' : 'default'}
                   className="w-full"
-                  onClick={() => toggleAdopted(pet.id, pet.adopted)}
+                  onClick={() => handleAdoptClick(pet)}
                 >
                   {pet.adopted ? (
                     <>
@@ -398,6 +505,59 @@ export default function Admin() {
             </Card>
           ))}
         </div>
+
+        <Dialog open={showAdoptionModal} onOpenChange={setShowAdoptionModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Registrar Adoção</DialogTitle>
+              <DialogDescription>
+                Preencha as informações do adotante de {selectedPetForAdoption?.name}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleAdoptionSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="adopter_name">Nome Completo</Label>
+                <Input
+                  id="adopter_name"
+                  value={adoptionData.adopter_name}
+                  onChange={(e) => setAdoptionData({ ...adoptionData, adopter_name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adopter_cpf">CPF</Label>
+                <Input
+                  id="adopter_cpf"
+                  value={adoptionData.adopter_cpf}
+                  onChange={(e) => setAdoptionData({ ...adoptionData, adopter_cpf: e.target.value })}
+                  placeholder="000.000.000-00"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adopter_phone">Telefone</Label>
+                <Input
+                  id="adopter_phone"
+                  value={adoptionData.adopter_phone}
+                  onChange={(e) => setAdoptionData({ ...adoptionData, adopter_phone: e.target.value })}
+                  placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={() => setShowAdoptionModal(false)} className="flex-1">
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={loading} className="flex-1">
+                  {loading ? 'Registrando...' : 'Confirmar Adoção'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
