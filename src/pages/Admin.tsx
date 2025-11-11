@@ -45,6 +45,7 @@ export default function Admin() {
     adopter_name: '',
     adopter_cpf: '',
     adopter_phone: '',
+    adoption_date: new Date().toISOString().split('T')[0],
   });
 
   // Form state
@@ -188,6 +189,7 @@ export default function Admin() {
           adopter_name: adoptionData.adopter_name,
           adopter_cpf: adoptionData.adopter_cpf,
           adopter_phone: adoptionData.adopter_phone,
+          adoption_date: adoptionData.adoption_date,
         }]);
 
       if (adoptionError) throw adoptionError;
@@ -207,11 +209,12 @@ export default function Admin() {
 
       setShowAdoptionModal(false);
       setSelectedPetForAdoption(null);
-      setAdoptionData({
-        adopter_name: '',
-        adopter_cpf: '',
-        adopter_phone: '',
-      });
+    setAdoptionData({
+      adopter_name: '',
+      adopter_cpf: '',
+      adopter_phone: '',
+      adoption_date: new Date().toISOString().split('T')[0],
+    });
       loadPets();
     } catch (error: any) {
       toast({
@@ -543,6 +546,17 @@ export default function Admin() {
                   value={adoptionData.adopter_phone}
                   onChange={(e) => setAdoptionData({ ...adoptionData, adopter_phone: e.target.value })}
                   placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adoption_date">Data da Adoção</Label>
+                <Input
+                  id="adoption_date"
+                  type="date"
+                  value={adoptionData.adoption_date}
+                  onChange={(e) => setAdoptionData({ ...adoptionData, adoption_date: e.target.value })}
                   required
                 />
               </div>

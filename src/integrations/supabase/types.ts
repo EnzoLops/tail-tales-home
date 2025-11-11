@@ -20,6 +20,7 @@ export type Database = {
           adopter_cpf: string
           adopter_name: string
           adopter_phone: string
+          adoption_date: string
           created_at: string
           id: string
           pet_id: string
@@ -29,6 +30,7 @@ export type Database = {
           adopter_cpf: string
           adopter_name: string
           adopter_phone: string
+          adoption_date?: string
           created_at?: string
           id?: string
           pet_id: string
@@ -38,6 +40,7 @@ export type Database = {
           adopter_cpf?: string
           adopter_name?: string
           adopter_phone?: string
+          adoption_date?: string
           created_at?: string
           id?: string
           pet_id?: string
