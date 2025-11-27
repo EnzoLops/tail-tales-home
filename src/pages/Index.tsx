@@ -163,8 +163,7 @@ const Index = () => {
                 <h3 className="font-semibold text-foreground">Endereço</h3>
               </div>
               <p className="text-muted-foreground">
-                Rua das Flores, 123<br />
-                Centro, São Paulo - SP
+                xxxxxx
               </p>
             </div>
             
@@ -174,7 +173,7 @@ const Index = () => {
                 <h3 className="font-semibold text-foreground">Telefone</h3>
               </div>
               <p className="text-muted-foreground">
-                (11) 3456-7890
+                (99) 99999-9999
               </p>
             </div>
             
@@ -184,12 +183,12 @@ const Index = () => {
                 <h3 className="font-semibold text-foreground">Redes Sociais</h3>
               </div>
               <a 
-                href="https://instagram.com/PetLarONG" 
+                href="https://instagram.com/xxxxxx" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
-                @PetLarONG
+                @xxxxxx
               </a>
             </div>
           </div>
