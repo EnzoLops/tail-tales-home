@@ -8,6 +8,28 @@ import ChatWidget from '@/components/ChatWidget';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+// Importar imagens locais
+import dogBob from '@/assets/dog-bob.png';
+import dogRex from '@/assets/dog-rex.png';
+import dogThor from '@/assets/dog-thor.png';
+import catLuna from '@/assets/cat-luna.png';
+import catMel from '@/assets/cat-mel.png';
+import catMia from '@/assets/cat-mia.png';
+
+// Mapa de imagens para resolver caminhos
+const imageMap: Record<string, string> = {
+  '/src/assets/dog-bob.png': dogBob,
+  '/src/assets/dog-rex.png': dogRex,
+  '/src/assets/dog-thor.png': dogThor,
+  '/src/assets/cat-luna.png': catLuna,
+  '/src/assets/cat-mel.png': catMel,
+  '/src/assets/cat-mia.png': catMia,
+};
+
+const resolveImage = (imagePath: string): string => {
+  return imageMap[imagePath] || imagePath;
+};
+
 interface Pet {
   id: string;
   name: string;
@@ -98,7 +120,7 @@ const PetDetail = () => {
           <div className="animate-fade-in">
             <div className="aspect-square rounded-2xl overflow-hidden shadow-card">
               <img
-                src={pet.image}
+                src={resolveImage(pet.image)}
                 alt={pet.name}
                 className="w-full h-full object-cover"
               />

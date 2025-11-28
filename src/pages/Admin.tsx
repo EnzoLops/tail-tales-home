@@ -53,7 +53,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_phone: '(11) 98765-4321',
     adoption_date: '2024-01-15',
     adopted_at: '2024-01-15T10:30:00Z',
-    pet_name: 'Rex',
+    pet_name: 'Pipoca',
   },
   {
     id: '2',
@@ -63,7 +63,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_phone: '(21) 99876-5432',
     adoption_date: '2024-02-20',
     adopted_at: '2024-02-20T14:00:00Z',
-    pet_name: 'Luna',
+    pet_name: 'Rock',
   },
   {
     id: '3',
@@ -73,7 +73,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_phone: '(31) 97654-3210',
     adoption_date: '2024-03-10',
     adopted_at: '2024-03-10T09:15:00Z',
-    pet_name: 'Thor',
+    pet_name: 'Cacau',
   },
   {
     id: '4',
@@ -83,7 +83,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_phone: '(41) 96543-2109',
     adoption_date: '2024-04-05',
     adopted_at: '2024-04-05T16:45:00Z',
-    pet_name: 'Mia',
+    pet_name: 'Nina',
   },
   {
     id: '5',
@@ -93,7 +93,97 @@ const fakeAdoptions: Adoption[] = [
     adopter_phone: '(51) 95432-1098',
     adoption_date: '2024-05-22',
     adopted_at: '2024-05-22T11:20:00Z',
-    pet_name: 'Bob',
+    pet_name: 'Max',
+  },
+];
+
+// Exemplos fictícios de pets adotados para exibir no filtro
+import dogBob from '@/assets/dog-bob.png';
+import dogRex from '@/assets/dog-rex.png';
+import dogThor from '@/assets/dog-thor.png';
+import catLuna from '@/assets/cat-luna.png';
+import catMia from '@/assets/cat-mia.png';
+
+const fakeAdoptedPets: Pet[] = [
+  {
+    id: 'fake-adopted-1',
+    name: 'Pipoca',
+    type: 'cachorro',
+    breed: 'Vira-lata',
+    age: '3 anos',
+    gender: 'Fêmea',
+    size: 'Médio',
+    vaccinated: true,
+    neutered: true,
+    description: 'Cachorrinha alegre e brincalhona',
+    history: 'Resgatada das ruas',
+    image: dogBob,
+    address: 'São Paulo - SP',
+    adopted: true,
+  },
+  {
+    id: 'fake-adopted-2',
+    name: 'Rock',
+    type: 'cachorro',
+    breed: 'Labrador',
+    age: '2 anos',
+    gender: 'Macho',
+    size: 'Grande',
+    vaccinated: true,
+    neutered: true,
+    description: 'Cachorro forte e leal',
+    history: 'Abandonado em estrada',
+    image: dogRex,
+    address: 'Rio de Janeiro - RJ',
+    adopted: true,
+  },
+  {
+    id: 'fake-adopted-3',
+    name: 'Cacau',
+    type: 'gato',
+    breed: 'Persa',
+    age: '4 anos',
+    gender: 'Fêmea',
+    size: 'Pequeno',
+    vaccinated: true,
+    neutered: true,
+    description: 'Gatinha carinhosa e tranquila',
+    history: 'Resgatada de maus-tratos',
+    image: catLuna,
+    address: 'Belo Horizonte - MG',
+    adopted: true,
+  },
+  {
+    id: 'fake-adopted-4',
+    name: 'Nina',
+    type: 'gato',
+    breed: 'Siamês',
+    age: '1 ano',
+    gender: 'Fêmea',
+    size: 'Pequeno',
+    vaccinated: true,
+    neutered: false,
+    description: 'Gatinha curiosa e ativa',
+    history: 'Encontrada em parque',
+    image: catMia,
+    address: 'Curitiba - PR',
+    adopted: true,
+  },
+  {
+    id: 'fake-adopted-5',
+    name: 'Max',
+    type: 'cachorro',
+    breed: 'Golden Retriever',
+    age: '5 anos',
+    gender: 'Macho',
+    size: 'Grande',
+    vaccinated: true,
+    neutered: true,
+    description: 'Cachorro dócil e companheiro',
+    history: 'Resgatado de abrigo',
+    image: dogThor,
+    address: 'Porto Alegre - RS',
+    adopted: true,
   },
 ];
 
@@ -578,7 +668,7 @@ export default function Admin() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pets
+              {[...pets, ...(filterStatus === 'adotados' || filterStatus === 'todos' ? fakeAdoptedPets : [])]
                 .filter(pet => 
                   filterStatus === 'todos' ? true : 
                   filterStatus === 'adotados' ? pet.adopted : !pet.adopted
