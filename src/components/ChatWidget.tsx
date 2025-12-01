@@ -43,16 +43,7 @@ const ChatWidget = ({ isOpen, onClose, petName }: ChatWidgetProps) => {
   const sendMessage = async () => {
     if (!inputMessage.trim()) return;
 
-    const webhookUrl = localStorage.getItem('n8n_webhook_url');
-    if (!webhookUrl) {
-      toast({
-        title: 'Webhook não configurado',
-        description: 'Configure o webhook antes de enviar mensagens.',
-        variant: 'destructive'
-      });
-      setShowConfig(true);
-      return;
-    }
+    const webhookUrl = localStorage.getItem('n8n_webhook_url') || 'https://n8n.garbellinitech.com.br/webhook/PetLar';
 
     const userMessage: Message = {
       role: 'user',

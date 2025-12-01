@@ -19,7 +19,7 @@ interface WebhookConfigProps {
 const WebhookConfig = ({ isOpen, onClose }: WebhookConfigProps) => {
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [webhookUrl, setWebhookUrl] = useState('');
+  const [webhookUrl, setWebhookUrl] = useState('https://n8n.garbellinitech.com.br/webhook/PetLar');
   const { toast } = useToast();
 
   useEffect(() => {
