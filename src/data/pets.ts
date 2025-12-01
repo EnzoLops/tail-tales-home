@@ -35,7 +35,7 @@ export const pets: Pet[] = [
     description: 'Thor é um vira-lata carinhoso e brincalhão que adora crianças.',
     history: 'Thor foi resgatado das ruas quando ainda era filhote. Ele é muito sociável e se dá bem com outros animais.',
     image: dogThor,
-    address: 'Rua das Flores, 123 - Centro, São Paulo - SP'
+    address: 'xxxxxxx, 00 xxxxx UF'
   },
   {
     id: '2',
@@ -50,7 +50,7 @@ export const pets: Pet[] = [
     description: 'Luna é uma gatinha tranquila e elegante, perfeita para apartamentos.',
     history: 'Luna foi encontrada abandonada em uma caixa. Hoje é uma gatinha saudável e carinhosa.',
     image: catLuna,
-    address: 'Rua das Flores, 123 - Centro, São Paulo - SP'
+    address: 'xxxxxxx, 00 xxxxx UF'
   },
   {
     id: '3',
@@ -65,7 +65,7 @@ export const pets: Pet[] = [
     description: 'Bob é um cachorro calmo e fiel, ideal para famílias.',
     history: 'Bob viveu nas ruas por alguns anos antes de ser resgatado. É muito grato e companheiro.',
     image: dogBob,
-    address: 'Rua das Flores, 123 - Centro, São Paulo - SP'
+    address: 'xxxxxxx, 00 xxxxx UF'
   },
   {
     id: '4',
@@ -80,7 +80,7 @@ export const pets: Pet[] = [
     description: 'Mel é uma gatinha peluda e super afetuosa.',
     history: 'Mel foi doada por uma família que não podia mais cuidar dela. É muito carinhosa e adora colo.',
     image: catMel,
-    address: 'Rua das Flores, 123 - Centro, São Paulo - SP'
+    address: 'xxxxxxx, 00 xxxxx UF'
   },
   {
     id: '5',
@@ -95,7 +95,7 @@ export const pets: Pet[] = [
     description: 'Rex é protetor e leal, ótimo guardião para sua casa.',
     history: 'Rex foi treinado como cão de guarda mas seu antigo dono precisou se mudar. Ele é obediente e inteligente.',
     image: dogRex,
-    address: 'Rua das Flores, 123 - Centro, São Paulo - SP'
+    address: 'xxxxxxx, 00 xxxxx UF'
   },
   {
     id: '6',
@@ -110,6 +110,6 @@ export const pets: Pet[] = [
     description: 'Mia é uma gatinha brincalhona e cheia de energia.',
     history: 'Mia nasceu na rua e foi resgatada muito novinha. É curiosa e adora brinquedos.',
     image: catMia,
-    address: 'Rua das Flores, 123 - Centro, São Paulo - SP'
+    address: 'xxxxxxx, 00 xxxxx UF'
   }
 ];
