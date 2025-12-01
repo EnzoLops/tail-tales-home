@@ -188,15 +188,15 @@ const Pets = () => {
         <div className="bg-card p-6 rounded-lg shadow-sm mb-8">
           <h3 className="text-lg font-semibold text-foreground mb-4">Filtros Adicionais</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Filtro de Tamanho */}
+            {/* Filtro de Porte */}
             <div className="space-y-2">
-              <Label htmlFor="size-filter">Tamanho</Label>
+              <Label htmlFor="size-filter">Porte</Label>
               <Select value={sizeFilter} onValueChange={(value) => setSizeFilter(value as SizeFilter)}>
                 <SelectTrigger id="size-filter">
-                  <SelectValue placeholder="Selecione o tamanho" />
+                  <SelectValue placeholder="Selecione o porte" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="todos">Todos os tamanhos</SelectItem>
+                  <SelectItem value="todos">Todos os portes</SelectItem>
                   <SelectItem value="Pequeno">Pequeno</SelectItem>
                   <SelectItem value="Médio">Médio</SelectItem>
                   <SelectItem value="Grande">Grande</SelectItem>
