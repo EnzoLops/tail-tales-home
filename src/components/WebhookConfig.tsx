@@ -29,6 +29,8 @@ const WebhookConfig = ({ isOpen, onClose }: WebhookConfigProps) => {
       const savedWebhook = localStorage.getItem('n8n_webhook_url');
       if (savedWebhook) {
         setWebhookUrl(savedWebhook);
+      } else {
+        setWebhookUrl('https://n8n.garbellinitech.com.br/webhook/PetLar');
       }
     }
   }, [isOpen]);
