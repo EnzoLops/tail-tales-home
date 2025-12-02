@@ -220,8 +220,10 @@ export default function Admin() {
     description: '',
     history: '',
     image: '',
-    address: 'Rua das Flores, 123 - Centro, São Paulo - SP',
+    address: 'xxxxxxx, 00 xxxxx UF',
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
 
   useEffect(() => {
     loadPets();
@@ -291,12 +293,41 @@ export default function Admin() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!imageFile) {
+      toast({
+        title: 'Erro',
+        description: 'Por favor, selecione uma foto para o pet.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Upload image to Supabase Storage
+      const fileExt = imageFile.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `pets/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('pet-images')
+        .upload(filePath, imageFile);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('pet-images')
+        .getPublicUrl(filePath);
+
+      const imageUrl = urlData.publicUrl;
+
+      // Insert pet with image URL
       const { error } = await supabase
         .from('pets')
-        .insert([formData]);
+        .insert([{ ...formData, image: imageUrl }]);
 
       if (error) throw error;
 
@@ -318,8 +349,10 @@ export default function Admin() {
         description: '',
         history: '',
         image: '',
-        address: 'Rua das Flores, 123 - Centro, São Paulo - SP',
+        address: 'xxxxxxx, 00 xxxxx UF',
       });
+      setImageFile(null);
+      setImagePreview('');
       loadPets();
     } catch (error: any) {
       toast({
@@ -604,9 +637,10 @@ export default function Admin() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) {
+                                setImageFile(file);
                                 const reader = new FileReader();
                                 reader.onloadend = () => {
-                                  setFormData({ ...formData, image: reader.result as string });
+                                  setImagePreview(reader.result as string);
                                 };
                                 reader.readAsDataURL(file);
                               }
@@ -619,11 +653,11 @@ export default function Admin() {
                             className="w-full"
                           >
                             <Upload className="mr-2 h-4 w-4" />
-                            {formData.image ? 'Alterar Foto' : 'Selecionar Foto'}
+                            {imagePreview ? 'Alterar Foto' : 'Selecionar Foto'}
                           </Button>
-                          {formData.image && (
+                          {imagePreview && (
                             <img 
-                              src={formData.image} 
+                              src={imagePreview} 
                               alt="Preview" 
                               className="h-10 w-10 object-cover rounded"
                             />
