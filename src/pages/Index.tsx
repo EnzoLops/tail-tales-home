@@ -81,16 +81,16 @@ const Index = () => {
             </h2>
             <div className="text-lg text-muted-foreground leading-relaxed space-y-4 text-left">
               <p>
-                A PetLar é uma organização sem fins lucrativos que nasceu do amor e do respeito pelos animais. Nossa missão é resgatar, cuidar e promover a adoção responsável de pets abandonados ou em situação de vulnerabilidade, oferecendo a cada um deles uma nova chance de ser feliz.
+                A organização (nome da ONG) é uma instituição (sem fins lucrativos / independente / comunitária) dedicada ao resgate, proteção e reabilitação de animais domésticos em situação de vulnerabilidade. Fundada em (ano de criação), a entidade atua com o compromisso de oferecer acolhimento temporário e cuidados essenciais a cães e gatos que se encontram abandonados, feridos ou em risco.
               </p>
               <p>
-                Acreditamos que todo pet merece um lar cheio de carinho, segurança e dignidade. Por isso, trabalhamos todos os dias para proporcionar abrigo, cuidados veterinários, alimentação e muito amor aos nossos animais resgatados.
+                Com sede em (cidade/estado), a (nome da ONG) trabalha na promoção do bem-estar animal, garantindo acompanhamento veterinário, condições dignas e suporte adequado até que cada pet esteja pronto para encontrar um lar por meio da adoção responsável.
               </p>
               <p>
-                Além do resgate e da adoção, a PetLar também atua na conscientização da sociedade sobre a importância da adoção responsável, da castração e do respeito aos direitos dos animais, incentivando uma convivência mais humana e solidária entre pessoas e pets.
+                A instituição desenvolve projetos e campanhas de conscientização voltados à comunidade, abordando temas como (guarda responsável / castração / prevenção de maus-tratos / educação ambiental), fortalecendo o vínculo entre sociedade e causa animal.
               </p>
               <p>
-                Com o apoio de voluntários, doadores e parceiros, conseguimos transformar histórias de abandono em finais felizes — onde cada pet encontra não apenas um lar, mas uma nova família.
+                Com uma equipe composta por (voluntários / profissionais especializados / parceiros), a ONG mantém processos transparentes e critérios rigorosos de adoção, reforçando sua missão de (missão principal da ONG) e seu compromisso em transformar a realidade dos animais que resgata.
               </p>
             </div>
           </div>
@@ -195,7 +195,7 @@ const Index = () => {
           
           <div className="text-center pt-6 border-t">
             <p className="text-muted-foreground">
-              © 2024 Adote um Pet. Feito com <Heart className="inline h-4 w-4 text-primary" /> para nossos amigos de quatro patas.
+              PetLar. Site desenvolvido para o trabalho de TCC da ETEC Antônio Furlan.
             </p>
           </div>
         </div>
