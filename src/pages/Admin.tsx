@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Plus, Check, X, Filter, ClipboardList, PawPrint } from 'lucide-react';
+import { LogOut, Plus, Check, X, Filter, ClipboardList, PawPrint, Upload } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -594,14 +594,41 @@ export default function Admin() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="image">URL da Imagem</Label>
-                        <Input
-                          id="image"
-                          value={formData.image}
-                          onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                          placeholder="/src/assets/pet-image.png"
-                          required
-                        />
+                        <Label htmlFor="image">Foto</Label>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="file"
+                            id="image"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setFormData({ ...formData, image: reader.result as string });
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => document.getElementById('image')?.click()}
+                            className="w-full"
+                          >
+                            <Upload className="mr-2 h-4 w-4" />
+                            {formData.image ? 'Alterar Foto' : 'Selecionar Foto'}
+                          </Button>
+                          {formData.image && (
+                            <img 
+                              src={formData.image} 
+                              alt="Preview" 
+                              className="h-10 w-10 object-cover rounded"
+                            />
+                          )}
+                        </div>
                       </div>
 
                       <div className="space-y-2">
