@@ -38,6 +38,7 @@ interface Adoption {
   adopter_name: string;
   adopter_cpf: string;
   adopter_phone: string;
+  adopter_address: string;
   adoption_date: string;
   adopted_at: string;
   pet_name?: string;
@@ -51,6 +52,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_name: 'Maria Silva Santos',
     adopter_cpf: '123.456.789-00',
     adopter_phone: '(11) 98765-4321',
+    adopter_address: 'Rua das Flores, 123 - Vila Mariana, São Paulo - SP',
     adoption_date: '2024-01-15',
     adopted_at: '2024-01-15T10:30:00Z',
     pet_name: 'Pipoca',
@@ -61,6 +63,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_name: 'João Pedro Oliveira',
     adopter_cpf: '987.654.321-00',
     adopter_phone: '(21) 99876-5432',
+    adopter_address: 'Av. Atlântica, 456 - Copacabana, Rio de Janeiro - RJ',
     adoption_date: '2024-02-20',
     adopted_at: '2024-02-20T14:00:00Z',
     pet_name: 'Rock',
@@ -71,6 +74,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_name: 'Ana Carolina Ferreira',
     adopter_cpf: '456.789.123-00',
     adopter_phone: '(31) 97654-3210',
+    adopter_address: 'Rua da Bahia, 789 - Centro, Belo Horizonte - MG',
     adoption_date: '2024-03-10',
     adopted_at: '2024-03-10T09:15:00Z',
     pet_name: 'Cacau',
@@ -81,6 +85,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_name: 'Carlos Eduardo Lima',
     adopter_cpf: '321.654.987-00',
     adopter_phone: '(41) 96543-2109',
+    adopter_address: 'Rua XV de Novembro, 321 - Centro, Curitiba - PR',
     adoption_date: '2024-04-05',
     adopted_at: '2024-04-05T16:45:00Z',
     pet_name: 'Nina',
@@ -91,6 +96,7 @@ const fakeAdoptions: Adoption[] = [
     adopter_name: 'Fernanda Costa Souza',
     adopter_cpf: '654.321.987-00',
     adopter_phone: '(51) 95432-1098',
+    adopter_address: 'Av. Ipiranga, 654 - Azenha, Porto Alegre - RS',
     adoption_date: '2024-05-22',
     adopted_at: '2024-05-22T11:20:00Z',
     pet_name: 'Max',
@@ -204,6 +210,7 @@ export default function Admin() {
     adopter_name: '',
     adopter_cpf: '',
     adopter_phone: '',
+    adopter_address: '',
     adoption_date: new Date().toISOString().split('T')[0],
   });
 
@@ -412,6 +419,7 @@ export default function Admin() {
           adopter_name: adoptionData.adopter_name,
           adopter_cpf: adoptionData.adopter_cpf,
           adopter_phone: adoptionData.adopter_phone,
+          adopter_address: adoptionData.adopter_address,
           adoption_date: adoptionData.adoption_date,
         }]);
 
@@ -435,6 +443,7 @@ export default function Admin() {
         adopter_name: '',
         adopter_cpf: '',
         adopter_phone: '',
+        adopter_address: '',
         adoption_date: new Date().toISOString().split('T')[0],
       });
       loadPets();
@@ -798,6 +807,7 @@ export default function Admin() {
                         <TableHead>Nome do Adotante</TableHead>
                         <TableHead>CPF</TableHead>
                         <TableHead>Telefone</TableHead>
+                        <TableHead>Endereço</TableHead>
                         <TableHead>Data da Adoção</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -810,12 +820,13 @@ export default function Admin() {
                           <TableCell>{adoption.adopter_name}</TableCell>
                           <TableCell>{adoption.adopter_cpf}</TableCell>
                           <TableCell>{adoption.adopter_phone}</TableCell>
+                          <TableCell className="max-w-[200px] truncate">{adoption.adopter_address}</TableCell>
                           <TableCell>{formatDate(adoption.adoption_date)}</TableCell>
                         </TableRow>
                       ))}
                       {adoptions.length === 0 && (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                          <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
                             Nenhum registro de adoção encontrado.
                           </TableCell>
                         </TableRow>
@@ -865,6 +876,17 @@ export default function Admin() {
                   value={adoptionData.adopter_phone}
                   onChange={(e) => setAdoptionData({ ...adoptionData, adopter_phone: e.target.value })}
                   placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adopter_address">Endereço</Label>
+                <Input
+                  id="adopter_address"
+                  value={adoptionData.adopter_address}
+                  onChange={(e) => setAdoptionData({ ...adoptionData, adopter_address: e.target.value })}
+                  placeholder="Rua, número - Bairro, Cidade - UF"
                   required
                 />
               </div>
