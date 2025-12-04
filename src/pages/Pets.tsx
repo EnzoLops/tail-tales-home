@@ -10,6 +10,14 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 import { AuthModal } from '@/components/AuthModal';
 
 // Importar imagens locais
@@ -51,6 +59,8 @@ interface Pet {
   image: string;
 }
 
+const PETS_PER_PAGE = 6;
+
 const Pets = () => {
   const [pets, setPets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +69,7 @@ const Pets = () => {
   const [vaccinatedFilter, setVaccinatedFilter] = useState<boolean | null>(null);
   const [neuteredFilter, setNeuteredFilter] = useState<boolean | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { logout, isAuthenticated } = useAuth();
@@ -107,6 +118,24 @@ const Pets = () => {
     if (neuteredFilter !== null && pet.neutered !== neuteredFilter) return false;
     return true;
   });
+
+  // Reset para página 1 quando filtros mudam
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, sizeFilter, vaccinatedFilter, neuteredFilter]);
+
+  // Cálculos de paginação
+  const totalPages = Math.ceil(filteredPets.length / PETS_PER_PAGE);
+  const startIndex = (currentPage - 1) * PETS_PER_PAGE;
+  const endIndex = startIndex + PETS_PER_PAGE;
+  const paginatedPets = filteredPets.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   if (loading) {
     return (
@@ -257,13 +286,13 @@ const Pets = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPets.map((pet) => (
+          {paginatedPets.map((pet) => (
             <Link 
               key={pet.id} 
               to={`/pet/${pet.id}`}
               className="group"
             >
-                <Card className="h-full transition-all duration-300 hover:shadow-hover hover:-translate-y-1 overflow-hidden">
+              <Card className="h-full transition-all duration-300 hover:shadow-hover hover:-translate-y-1 overflow-hidden">
                 <div className="aspect-[4/3] overflow-hidden">
                   <img
                     src={resolveImage(pet.image)}
@@ -298,6 +327,44 @@ const Pets = () => {
             <p className="text-xl text-muted-foreground">
               Nenhum pet encontrado com esse filtro.
             </p>
+          </div>
+        )}
+
+        {/* Paginação */}
+        {totalPages > 1 && (
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              Exibindo {startIndex + 1}-{Math.min(endIndex, filteredPets.length)} de {filteredPets.length} pets
+            </p>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </main>
