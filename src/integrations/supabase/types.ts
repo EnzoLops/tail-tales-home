@@ -17,6 +17,7 @@ export type Database = {
       adoptions: {
         Row: {
           adopted_at: string
+          adopter_address: string
           adopter_cpf: string
           adopter_name: string
           adopter_phone: string
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           adopted_at?: string
+          adopter_address?: string
           adopter_cpf: string
           adopter_name: string
           adopter_phone: string
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           adopted_at?: string
+          adopter_address?: string
           adopter_cpf?: string
           adopter_name?: string
           adopter_phone?: string
